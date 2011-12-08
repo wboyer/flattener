@@ -3,7 +3,7 @@ var fs = require('fs');
 var path = require('path');
 
 var origin = "www.mtv.com";
-var cacheDir = "temp";
+var cacheDir = "tmp";
 
 
 http.createServer(function (req, res) {
