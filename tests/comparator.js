@@ -1,28 +1,32 @@
 
-var requestQueue = function () {
+var refreshManager = function () {
 
-	var queue = [];
+	var MAX_REQUESTS = 100;
+
+	var _queue = [];
 	var _map = {}
-
-	var ord = 0;
 	
-	var add = function(url) {
+	var processing = 0;
 
-		if (_map[url]) {
-			_map[url].count++;
-		} else {
-			_map[url] = {
-				"count": 0
-				"order": ord++
-			}
+	var add = function(url) {
+		var pos;
 		
+		if (_map[url]) {
+		
+			_map[url].count++;
+
+		} else {
+
+			_map[url] = {
+				"url": url,
+				"count": 0,
+			}
+	
+			pos = _queue.push(_map[url]);
+			
+			_map[url].queueEntry = _queue[pos-1];
 		}
 		
-		queue.push({
-			"url": url,
-			"count": 1,
-			"order": ord++
-		})
 	}
 	
 	var compare = function(item1, item2) {
@@ -33,21 +37,27 @@ var requestQueue = function () {
 		if (item2.count > item1.count)
 			return 1
 	
-		if (item1.ord > item2.ord)
-			return -1
-	
-		if (item2.ord > item1.ord)
-			return 1
-	
 		return 0
 	}
 	
 	var next = function() {
-		if (!queue.length)
+
+		var _next;
+		
+		if (!_queue.length  || processing == MAX_REQUESTS)
 			return false
-			
-		queue.sort(compare);
-		return queue.shift()
+		
+		processing++;
+		
+		_queue.sort(compare);
+		console.log(_queue[0])
+		
+		_next = _queue.shift();
+		console.log(_next.url)
+		console.log(_next.queueEntry)
+		delete _next.queueEntry
+		console.log(_next.queueEntry)
+		return _next
 	}
 
 	return {
@@ -81,4 +91,9 @@ while (test = requestQueue.next().url) {
 	assert.equal(test, val, "Should be " + val + ", was " + test)
 }
 
+
+/*
+	test that when we get next, we break the links between the _map and the queue
+
+*/
 
