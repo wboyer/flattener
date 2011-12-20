@@ -2,21 +2,20 @@
 var requestQueue = function () {
 
 	var queue = [];
+	var _map = {}
+
 	var ord = 0;
 	
 	var add = function(url) {
-	
-		var check = function(ele, ind, arr) {
-			if (ele.url == url) {
-				ele.count++
-				return true
-			} else {
-				return false
+
+		if (_map[url]) {
+			_map[url].count++;
+		} else {
+			_map[url] = {
+				"count": 0
+				"order": ord++
 			}
-		}
 		
-		if (queue.some(check)) {
-			return false
 		}
 		
 		queue.push({
