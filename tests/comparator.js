@@ -1,8 +1,12 @@
-	var http = require('http');
+var http = require('http');
 
-http.createServer(function (req, res) {
+var httpProxy = http.createServer(function (req, res) {
 
-}).listen(8081, "0.0.0.0");
+	refreshManager.add(req.url, res)
+	refreshManager.checkQueue();
+
+
+}).listen(9100, "0.0.0.0");
 
 
 var fileCacheWriter = function() {
@@ -10,25 +14,20 @@ var fileCacheWriter = function() {
 	
 	var origin = "localhost";
 	
-	var site = http.createClient(9200, origin);
 	
 	var write = function(item) {
 
-		var request = site.request("GET", item.url);
-		request.end();
-
 		console.log("requesting")
 
-		item.waiting.forEach(function(ele, ind, arr) {
-		console.log("assinging")
-			request.on('response', function (response) {
-		console.log("responding")
-				response.pipe(ele.res);
-				
-			});	
-		})
-
+		var request = http.request({"port":9200, "path":item.url}, function(response) {
+			console.log("response")
+			
+			while(item.waiting.length > 0)
+				response.pipe(item.waiting.pop());
+			
+		});
 		
+		request.end();
 
 	
 	}
@@ -50,14 +49,16 @@ var refreshManager = function () {
 	var processing = 0;
 
 	var add = function(url, res) {
+
 		var pos;
 		
-		if (_map[url]) {
 		
+		if (_map[url]) {
+
 			_map[url].count++;
 
 		} else {
-
+			
 			_map[url] = {
 				"url": url,
 				"count": 0,
@@ -69,8 +70,9 @@ var refreshManager = function () {
 			_map[url].queueEntry = _queue[pos-1];
 		}
 		
-		if (res) 
+		if (res) {
 			_map[url].waiting.push(res);
+		}
 		
 		return _map[url]
 		
@@ -113,20 +115,26 @@ var refreshManager = function () {
 
 	var checkQueue = function() {
 	
-		console.log("checkQueue")
-		console.log(next())
 		var item = next();
+		
+
 
 		if (item) {
-			console.log("item")
 			fileCacheWriter.write(item)
 		}
 	}
-
+	
+	var requestDone = function(url) {
+		if (true) {
+			delete _map[url];
+		}
+	}
+	
 	return {
 		"add": add,
 		"next": next,
 		"checkQueue": checkQueue,
+		"requestDone": requestDone,
 		"_queue": _queue
 	}
 
@@ -140,9 +148,9 @@ var assert = require("assert");
 
 
 var test;
-var urls = ["url1", "url2", "url3", "url2", "url4", "url2", "url5", "url1", "url2", "url6"];
+var urls = ["/url1", "/url2", "/url3", "/url2", "/url4", "/url2", "/url5", "/url1", "/url2", "/url6"];
 var writerUrls = [0,0,0,0,0,0,1,0,0,0]
-var sorted = ["url5", "url2", "url1", "url3", "url4", "url6"]
+var sorted = ["/url5", "/url2", "/url1", "/url3", "/url4", "/url6"]
 
 
 urls.forEach(function(ele, ind, arr) {
@@ -150,26 +158,15 @@ urls.forEach(function(ele, ind, arr) {
 })
 
 /** test sorting function **/
+	console.log("\n Sorting test")
 
 while (test = refreshManager.next().url) {
 	val = sorted.shift();
 	console.log(test + ", " + val)
 	assert.equal(test, val, "Should be " + val + ", was " + test)
+	refreshManager.requestDone(test);
 }
 
-
-/** test add function **/
-
-	test = refreshManager.add("url1").waiting.length;
-	val = 0;
-	console.log(test + ", " + val)
-	
-	assert.equal(test, val, "Should be " + val + ", was " + test)
-
-	test = refreshManager.add("url1", true).waiting.length;
-	val = 1;
-	console.log(test + ", " + val)
-	assert.equal(test, val, "Should be " + val + ", was " + test)
 
 
 
@@ -177,11 +174,25 @@ while (test = refreshManager.next().url) {
 	test that when we get next, we break the links between the _map and the queue
 
 */
+console.log("\n Waiting test")
 
 urls.forEach(function(ele, ind, arr) {
-	console.log("add")
-	refreshManager.add(ele, writerUrls[ind]);
+
+	if (writerUrls[ind]) {
+	
+		http.get({
+			"port":9100,
+			"path": ele
+		});
+		
+	} else {
+	
+		refreshManager.add(ele);
+		refreshManager.checkQueue();
+
+
+	}
+	
 })
-console.log(refreshManager._queue)
-//refreshManager.checkQueue();
+
 
