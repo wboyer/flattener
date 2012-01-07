@@ -12,6 +12,7 @@ To Do
 -------
 
 * write out the test harness, include the tracking server in the test file, include the server as well.
+* figure out what headers need to be passed through, ignored, taken into account
 
 
 Test Cases
@@ -22,7 +23,10 @@ Test Cases
 * what if we have multiple requestors, then more get added during the piping of the response? do we attach them to the file end event?
 
 
+Considerations
+----------------
 
+* How are we going to configure it
 
 ### here is an h3
 
