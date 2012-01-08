@@ -31,4 +31,4 @@ http.createServer(function (req, res) {
 	
 }).listen(9200, "0.0.0.0");
 
-console.log("Origin Server: listening on :9200");
+console.log("Origin Server: listening on: 9200");

@@ -41,17 +41,16 @@ var read = function(url, res) {
 	var headerUrl = cacheDir + '/' + url + ".header";
 
 	check(headerUrl, function(result) {
-			console.log("fileCacheReader result " + result)
 
 		if (result == 'ENOENT') {
 		
-			console.log("fileCacheReader from origin")
+			console.log("fileCacheReader request from origin")
 
 			refreshManager.add(url, res)
 
 		} else {
 
-			console.log("fileCacheReader from cache")
+			console.log("fileCacheReader deliver from cache")
 			
 			clientResponse = JSON.parse(result);
 
@@ -75,25 +74,3 @@ var read = function(url, res) {
 
 exports.read = read;
 
-
-
-/** testing **/
-
-if (process.argv[2] == "test") {
-
-	var assert = require("assert");
-	console.log("running tests");
-	
-	console.log("test check() when file  doesn't exist");
-
-	check("foo/bar", function(res){
-		assert.equal(res, "ENOENT", "file doesn't exist")
-	})
-
-	console.log("test check() when file  does exist");
-
-	check("tests/test.txt", function(res){
-		assert.equal(res, "test", "file does exist")
-	})
-																																																																																																																																																																																																																																																																																																																																																																																																																									
-}
