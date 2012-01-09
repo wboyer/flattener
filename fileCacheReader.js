@@ -4,6 +4,11 @@ var http = require('http'),
 
 var cacheDir = "tmp";
 
+function log (args) {
+	console.log("fileCacheReader.js: " + args);
+}
+
+
 var check = function(url, callback) {
 	var result = false;
 	
@@ -44,13 +49,13 @@ var read = function(url, res) {
 
 		if (result == 'ENOENT') {
 		
-			console.log("fileCacheReader request from origin")
+			log("request from origin")
 
 			refreshManager.add(url, res)
 
 		} else {
 
-			console.log("fileCacheReader deliver from cache")
+			log("deliver from cache")
 			
 			clientResponse = JSON.parse(result);
 
@@ -74,3 +79,34 @@ var read = function(url, res) {
 
 exports.read = read;
 
+
+
+/** testing **/
+
+if (process.argv[2] == "test") {
+
+
+	var assert = require("assert");
+	log("running tests");
+	
+	var tests = {
+		"test check() returns 'EONENT' when file  doesn't exist": function() {
+			check(__dirname + "/foo/bar", function(res){
+				assert.equal(res, "ENOENT", "file doesn't exist")
+			});
+		},
+
+		"test check() returns data when file  doesn't exist": function() {
+			check(__dirname + "/tests/test.txt", function(res){
+				assert.equal(res, "test", "file does exist")
+			});
+		}		
+	}
+
+	for (key in tests) {
+		log(key);
+		tests[key]();
+	}
+
+																																																																																																																																																																																																																																																																																																																																																																																																																									
+}

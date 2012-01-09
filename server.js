@@ -24,7 +24,10 @@ var server = http.createServer(function (req, res) {
 	
 }
 
-}).listen(port, "0.0.0.0", function() {
+});
+
+
+server.listen(port, "0.0.0.0", function() {
 
 	console.log("Caching Server: listening on: " + port);
 	

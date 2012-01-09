@@ -8,9 +8,13 @@ var origin = "localhost";
 var port = 9200;
 var cacheDir = "tmp";
 
-var write = function(item) {
+function log (args) {
+	console.log("fileCacheWriter.js: " + args);
+}
 
-	console.log("requesting " + item.url)
+var write = function(item, callback) {
+
+	log("requesting " + item.url)
 	
 	var reqParts = item.url.substr(1).split("/")
 	var reqFile = reqParts.pop() || "index.html";
@@ -22,7 +26,7 @@ var write = function(item) {
 
 		var request = http.request({"port":port, "path":item.url}, function(response) {
 		
-			console.log("response " + item.url)
+			log("response " + item.url)
 		
 			response.setMaxListeners(0); 
 
@@ -41,7 +45,8 @@ var write = function(item) {
 	
 			while(item.waiting.length > 0)
 				response.pipe(item.waiting.pop());
-				
+			
+			callback();
 			refreshManager.requestDone(item.url);
 			
 		});
@@ -50,6 +55,12 @@ var write = function(item) {
 
 	})
 
+}
+
+var rm = function (url, callback) {
+	fs.unlink(url, function(err) {
+		callback()
+	});
 }
 
 var prepare_paths = function(parts, cb) {
@@ -67,7 +78,7 @@ var prepare_paths = function(parts, cb) {
 		path.exists(test.join("/"), function(exists) {
 			if (!exists) {
 				fs.mkdir(test.join("/"), 0755, function(err) {
-					(err) ? console.log(err) : mkdirs(parts.shift()) ;
+					(err) ? log(err) : mkdirs(parts.shift()) ;
 				})
 			} else {
 				mkdirs(parts.shift())
@@ -80,6 +91,74 @@ var prepare_paths = function(parts, cb) {
 }
 
 exports.write = write;
+exports.rm = rm;
 
+
+/** testing **/
+
+if (process.argv[2] == "test") {
+
+
+	var assert = require("assert");
+	log("running tests");
+	
+	var tests = {
+		"rm() returns 'EONENT' when file  doesn't exist": function() {
+			rm(__dirname + "/foo/bar", function(res){
+				assert.equal(res, "ENOENT", "file doesn't exist")
+				next();
+			});
+		},
+
+		"write() creates a file ": function() {
+			var old_http = http;
+			http.request = function(req, res) {
+				return {
+					"responseCode": 200,
+					"headers": {
+						"foo":"bar"
+					},
+					"body": "test body content",
+					"end": function() {
+						res({
+						 "setMaxListeners": function() {
+						 	return true;
+						 },
+						 "pipe": function(s) {
+						 	s.end();
+						 	return true;
+						 }
+
+						});
+						return true;
+					}
+				}
+			}
+			write({ 
+					"url": __dirname + "/foo/bar",
+					"waiting": []
+				}, function(res){
+					assert.equal(fs.statSync( __dirname + "/" + cacheDir  + "/foo/bar").isFile(), "ENOENT",  __dirname + "/" + cacheDir +"/foo/bar doesn't exist")
+				http.request = old_http.request;
+				next();
+			});
+		}		
+		
+	}
+	
+	testsArray = []
+	for (key in tests) {
+		testsArray.push(key)
+	}
+
+	var next = function () {
+		var item = testsArray.pop();
+		log(item)
+		tests[item]();
+	}
+	
+	next();
+																																																																																																																																																																																																																																																																																																																																																																																																																									
+}
 
 

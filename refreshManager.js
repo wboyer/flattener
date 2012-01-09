@@ -40,6 +40,12 @@ var add = function(url, res) {
 	
 }
 
+var remove = function(url) {
+
+	
+}
+
+
 var compare = function(item1, item2) {
 
 	if (item1.waiting.length > item2.waiting.length)
@@ -96,6 +102,7 @@ exports.add =  add;
 exports.next =  next;
 exports.checkQueue =  checkQueue;
 exports.requestDone =  requestDone;
+exports.remove =  remove;
 exports._queue =  _queue;
 exports._map =  _map;
 	

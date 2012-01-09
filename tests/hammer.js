@@ -2,7 +2,7 @@ var exec = require('child_process').exec;
 var origin = require('./track.js');
 var app = require('../server.js');
 
-app.server.on("listening", function() {
+app.server.on("listeningd", function() {
 
 // testing that multple requests for the same url don't hit the origin server more than once.
 // 1. remove the test file from cache
@@ -30,7 +30,7 @@ app.server.on("listening", function() {
 
 /** testing **/
 
-if (process.argv[2] == "test") {
+if (process.argv[2] == "tesdt") {
 
 	var assert = require("assert");
 	
@@ -94,23 +94,3 @@ if (process.argv[2] == "test") {
 
 
 
-/** testing **/
-
-if (process.argv[2] == "test") {
-
-	var assert = require("assert");
-	console.log("running tests");
-	
-	console.log("test check() when file  doesn't exist");
-
-	check("foo/bar", function(res){
-		assert.equal(res, "ENOENT", "file doesn't exist")
-	})
-
-	console.log("test check() when file  does exist");
-
-	check("tests/test.txt", function(res){
-		assert.equal(res, "test", "file does exist")
-	})
-																																																																																																																																																																																																																																																																																																																																																																																																																									
-}
