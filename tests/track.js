@@ -2,6 +2,9 @@ var http = require('http');
 
 http.createServer(function (req, res) {
 
+	console.log("Origin Hit")
+
+
 	var delay = 5000;
 
 	var respond = function(req, res) {
@@ -32,3 +35,4 @@ http.createServer(function (req, res) {
 }).listen(9200, "0.0.0.0");
 
 console.log("Origin Server: listening on: 9200");
+

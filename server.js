@@ -17,10 +17,12 @@ var server = http.createServer(function (req, res) {
  if (req.url == "/checkQueue") {
 
  	refreshManager.checkQueue();
+	this.emit("listeningd");
 
  } else {
 	console.log("Cache Server:  " + req.url)
 	fileCacheReader.read(req.url, res)
+	
 	
 }
 

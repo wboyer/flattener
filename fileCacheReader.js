@@ -31,8 +31,9 @@ var check = function(url, callback) {
 			result = data;
 
 		}
-		
-		callback(result);
+		if (typeof callback === 'function') {
+			callback(result);
+		}
 	});
 
 }
@@ -83,30 +84,43 @@ exports.read = read;
 
 /** testing **/
 
-if (process.argv[2] == "test") {
+if (process.argv[2] == "dtest") {
 
 
 	var assert = require("assert");
 	log("running tests");
 	
 	var tests = {
-		"test check() returns 'EONENT' when file  doesn't exist": function() {
+		"test check() returns 'ENOENT' when file  doesn't exist": function() {
 			check(__dirname + "/foo/bar", function(res){
 				assert.equal(res, "ENOENT", "file doesn't exist")
+				next();
+
 			});
 		},
 
-		"test check() returns data when file  doesn't exist": function() {
+		"test check() returns data when file exists": function() {
 			check(__dirname + "/tests/test.txt", function(res){
 				assert.equal(res, "test", "file does exist")
+				next();
 			});
 		}		
 	}
 
+	var testsArray = []
 	for (key in tests) {
-		log(key);
-		tests[key]();
+		testsArray.push(key)
 	}
 
+	var next = function () {
+		var item = testsArray.pop();
+		if (item) {
+			log(item)
+			tests[item]();
+		}
+	}
+	
+	next();
+					
 																																																																																																																																																																																																																																																																																																																																																																																																																									
 }

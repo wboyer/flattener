@@ -2,7 +2,9 @@ var exec = require('child_process').exec;
 var origin = require('./track.js');
 var app = require('../server.js');
 
-app.server.on("listeningd", function() {
+
+var curl10 = function() {
+
 
 // testing that multple requests for the same url don't hit the origin server more than once.
 // 1. remove the test file from cache
@@ -16,16 +18,15 @@ app.server.on("listeningd", function() {
 	
 			var j = i;
 			
-			console.log("requesting " + j);
+			console.log("Curl " + j);
 			
-			exec('curl localhost:9100/foo/bar2dd33.jhtml -s', function(error, stout, stderr) {
-				console.log("++++++++++++++++\nserver response " + j + ":\n" + stout + "(" + error + ")\n+++++++++++++++" + stderr);
+			exec('curl localhost:9100/foo/bar2ddd3d.jhtml -s', function(error, stout, stderr) {
 			})
 		}();
 	}
-	
+}
 
-})
+app.server.on("listeningd", curl10)
 
 
 /** testing **/
