@@ -6,8 +6,8 @@ var exec = require('child_process').exec;
 
 var refreshManager = require('./refreshManager');
 	
-var origin = "localhost";
-var port = 9200;
+var origin = "www.mtv.com";
+var port = 80;
 var cacheDir = "tmp";
 
 function log (args) {
@@ -23,10 +23,11 @@ var write = function(item, callback) {
 	var reqDir =  reqParts.join("/") + "/";
 	var url = reqDir + reqFile;
 
+	console.log("about to prepare paths")
+	prepare_paths(reqParts, function() {	
+		console.log("starting request: " + item.url)
 
-	prepare_paths(reqParts, function() {
-
-		var request = http.request({"port":port, "path":item.url}, function(response) {
+		var request = http.request({"host":origin, "port":port, "path":item.url}, function(response) {
 		
 			log("response " + item.url)
 		
@@ -98,7 +99,7 @@ var rm = function (url, cb) {
 }
 
 var prepare_paths = function(parts, cb) {
-
+	console.log("preparing path: " + parts.join("/"))
 	var test = [];
 	
 	var mkdirs = function(next_item) { 

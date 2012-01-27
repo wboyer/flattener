@@ -1,8 +1,8 @@
 var http = require('http');
+
 var fileCacheWriter = require('./fileCacheWriter');
 var refreshManager = require('./refreshManager');
 var fileCacheReader = require('./fileCacheReader');
-var origin = require('./tests/track');
 
 var port = 9100;
 

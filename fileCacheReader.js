@@ -42,6 +42,18 @@ var cacheValid = function(headers) {
 	return true
 }
 
+var handle = function(result) {
+
+	if (result == 'ENOENT') {
+	
+		log("request from origin")
+
+		refreshManager.add()
+
+	}
+
+}
+
 var read = function(url, res) {
 	var clientResponse, cachedResponse;
 	var headerUrl = cacheDir + '/' + url + ".header";
@@ -79,48 +91,5 @@ var read = function(url, res) {
 }
 
 exports.read = read;
+exports.handle = handle;
 
-
-
-/** testing **/
-
-if (process.argv[2] == "dtest") {
-
-
-	var assert = require("assert");
-	log("running tests");
-	
-	var tests = {
-		"test check() returns 'ENOENT' when file  doesn't exist": function() {
-			check(__dirname + "/foo/bar", function(res){
-				assert.equal(res, "ENOENT", "file doesn't exist")
-				next();
-
-			});
-		},
-
-		"test check() returns data when file exists": function() {
-			check(__dirname + "/tests/test.txt", function(res){
-				assert.equal(res, "test", "file does exist")
-				next();
-			});
-		}		
-	}
-
-	var testsArray = []
-	for (key in tests) {
-		testsArray.push(key)
-	}
-
-	var next = function () {
-		var item = testsArray.pop();
-		if (item) {
-			log(item)
-			tests[item]();
-		}
-	}
-	
-	next();
-					
-																																																																																																																																																																																																																																																																																																																																																																																																																									
-}
