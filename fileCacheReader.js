@@ -8,17 +8,27 @@ function log (args) {
 	console.log("fileCacheReader.js: " + args);
 }
 
+var cacheValid = function(headers) {
+	return true
+}
 
-var check = function(url, callback) {
-	var result = false;
-	
-	fs.readFile(url, function (err, data) {
+var read = function(url, res) {
+
+	var clientResponse, cachedResponse, headerUrl;
+
+	if (!url) {
+		return false;
+	}
+
+	headerUrl = cacheDir + '/' + url + ".header";
+
+	fs.readFile(headerUrl, function (err, data) {
 
 		if (err) { 
 
 			if (err.code == 'ENOENT') {
 
-				result = err.code;  // file does not exist
+				refreshManager.add(url, res)
 
 			} else {
 
@@ -27,48 +37,6 @@ var check = function(url, callback) {
 			}
 
 		} else {
-
-			result = data;
-
-		}
-		if (typeof callback === 'function') {
-			callback(result);
-		}
-	});
-
-}
-
-var cacheValid = function(headers) {
-	return true
-}
-
-var handle = function(result) {
-
-	if (result == 'ENOENT') {
-	
-		log("request from origin")
-
-		refreshManager.add()
-
-	}
-
-}
-
-var read = function(url, res) {
-	var clientResponse, cachedResponse;
-	var headerUrl = cacheDir + '/' + url + ".header";
-
-	check(headerUrl, function(result) {
-
-		if (result == 'ENOENT') {
-		
-			log("request from origin")
-
-			refreshManager.add(url, res)
-
-		} else {
-
-			log("deliver from cache")
 			
 			clientResponse = JSON.parse(result);
 
@@ -81,15 +49,14 @@ var read = function(url, res) {
 			if (!cacheValid(clientResponse)) {
 				refreshManager.add(url)
 			}
-		
-		}
 
-				
+		}
+		
+		emit('fileRed')
 
 	});
 
 }
 
 exports.read = read;
-exports.handle = handle;
 
