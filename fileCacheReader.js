@@ -16,7 +16,7 @@ var read = function(url, res) {
 
 	var clientResponse, cachedResponse, headerUrl;
 
-	if (!url) {
+	if (!url || !res) {
 		return false;
 	}
 
@@ -27,7 +27,6 @@ var read = function(url, res) {
 		if (err) { 
 
 			if (err.code == 'ENOENT') {
-
 				refreshManager.add(url, res)
 
 			} else {
@@ -38,7 +37,7 @@ var read = function(url, res) {
 
 		} else {
 			
-			clientResponse = JSON.parse(result);
+			clientResponse = JSON.parse(data);
 
 			res.writeHead(+clientResponse.statusCode, clientResponse.headers);
 			cachedResponse = fs.createReadStream(cacheDir + '/' + url);
@@ -52,7 +51,6 @@ var read = function(url, res) {
 
 		}
 		
-		emit('fileRed')
 
 	});
 
