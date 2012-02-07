@@ -36,9 +36,8 @@ var read = function(url, res) {
 			}
 
 		} else {
-			
+		
 			clientResponse = JSON.parse(data);
-
 			res.writeHead(+clientResponse.statusCode, clientResponse.headers);
 			cachedResponse = fs.createReadStream(cacheDir + '/' + url);
 			cachedResponse.pipe(res)				
