@@ -30,7 +30,7 @@ var read = function(url, res) {
 				refreshManager.add(url, res)
 
 			} else {
-
+				log("other error")
 				//other error
 
 			}

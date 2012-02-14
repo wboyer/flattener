@@ -1,6 +1,5 @@
 var http = require('http');
 
-var fileCacheWriter = require('./fileCacheWriter');
 var refreshManager = require('./refreshManager');
 var fileCacheReader = require('./fileCacheReader');
 
@@ -15,9 +14,7 @@ var port = 9100;
 var server = http.createServer(function (req, res) {
 
  if (req.url == "/checkQueue") {
-
  	refreshManager.checkQueue();
-	this.emit("listeningd");
 
  } else {
 	console.log("Cache Server:  " + req.url)
