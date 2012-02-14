@@ -1,6 +1,5 @@
 var fileCacheWriter = require('./fileCacheWriter');
 
-
 var MAX_REQUESTS = 100;
 
 var _queue = [];

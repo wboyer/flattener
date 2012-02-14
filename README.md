@@ -8,6 +8,25 @@ An implementation of a caching server with the following:
 * A `fileCacheWriter` that can make a request to an origin server, and store the result in the file system
 * A `refreshManager` that manages requests, keeps a queue of pending requests, prioritizes that queue, and passes them on to the `fileCacheWriter`
 
+Getting Started
+-------
+
+* Currently being developed against nodejs v0.6.8 
+* Download/checkout the code
+* From within the root of the project directory: `node server.js`
+* This should start the server: `Caching Server: listening on: 9100`
+* Currently configuration is done in each file:
+	* in `server.js`, the port the cache proxy is listening on is set to 9100
+	* in `fileCacheWriter.js` the origin server is set to "www.mtv.com", the cache directory is set to "tmp" (relative to the directory we are running in)
+	* in `fileCacheReader.js` the cache directory is again set to "tmp" (need a plan to remove duplication)
+	
+Visiting <http://localhost:9100/> should return the index page at <http://www.mtv.com/> and cause a .header and a cache file to be written in the tmp directory.   	
+
+Blockers
+-----------
+
+* sometimes requests hang for a very long time.  then the problem goes away.  I need to collect more information on how to reproduce.
+
 To Do
 -------
 
@@ -32,6 +51,9 @@ Considerations
 
 * How are we going to configure it
 
+
+Markup Examples
+----------------
 ### here is an h3
 
 This is what a code block looks like
