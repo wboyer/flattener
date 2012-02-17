@@ -37,6 +37,7 @@ To Do
 * add a clear cache that will remove the tmp directory
 * figure out where to store the variables like, port, cache dir path
 * boom!
+* rewrite all the log functions (maybe put in utils). its not using args or apply.
 
 Test Cases
 ------------

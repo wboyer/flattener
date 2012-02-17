@@ -1,4 +1,6 @@
 var fileCacheWriter = require('./fileCacheWriter');
+var fileCacheReader = require('./fileCacheReader');
+var httpReader = require('./httpReader');
 
 var MAX_REQUESTS = 100;
 
@@ -85,7 +87,40 @@ var checkQueue = function() {
 	var item = next();
 
 	if (item) {
-		fileCacheWriter.write(item)
+		var req = {
+			"url": item.url
+		}
+		
+		var headers = fileCacheReader.getHeaders(item.url)
+		if (headers["cache-control"]) {
+			req.headers = {
+				"if-modified-sinced": headers.date
+			}
+		}
+		
+		// console.log(headers)
+		// http request for item here?
+		
+		fileCacheWriter.prepare_paths(item.url, function() {
+		
+			httpReader.read(req,  function(response) {
+				var waiting;
+				while(item.waiting.length > 0) {
+					waiting = item.waiting.pop()
+					response.pipe(waiting);
+					waiting.on("pipe", function () {
+						log("piping to waiting response");
+					})
+				}
+
+				fileCacheWriter.write(item, response)
+
+				requestDone(item.url) // is this the right 'time' to do this? when is done?				
+				
+			});
+		});
+		
+		// fileCacheWriter.write(item)
 	}
 }
 

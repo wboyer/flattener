@@ -20,7 +20,6 @@ var server = http.createServer(function (req, res) {
 	console.log("Cache Server:  " + req.url)
 	fileCacheReader.read(req.url, res)
 	
-	
 }
 
 });
