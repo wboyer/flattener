@@ -1,7 +1,17 @@
 var exec = require('child_process').exec;
+var http = require('http');
+
 var origin = require('./track.js');
+
 var app = require('../server.js');
 
+var refreshManager = require('../refreshManager.js');
+var fileCacheWriter = require('../fileCacheWriter.js');
+var httpReader = require('../httpReader.js');
+
+
+httpReader.setOrigin("localhost");
+httpReader.setPort(9200);
 
 var curl10 = function() {
 
@@ -11,6 +21,7 @@ var curl10 = function() {
 // 2. curl 10 times before the a response happens (test server should have a mode where its delayed a certain amount of time, but maybe another way is to return after a certain number of responses.
 // 3. verify that the origin server only delivers once
 
+fileCacheWriter.rm("/tmp/foo/");
 	var g;
 	
 	for (var i = 0; i < 10; i++) {
@@ -21,17 +32,28 @@ var curl10 = function() {
 			console.log("Curl " + j);
 			
 			exec('curl localhost:9100/foo/bar2ddd3d.jhtml -s', function(error, stout, stderr) {
+				console.log(stout)
 			})
 		}();
 	}
 }
 
-app.server.on("listeningd", curl10)
+app.server.on("listening", curl10)
 
-
+/* disabled until i can get the writerUrls to be stubbed responses */
 /** testing **/
 
-if (process.argv[2] == "tesdt") {
+if (process.argv[2] == "test") {
+
+	var fakeReq = function() {
+		
+		
+		
+		
+		return {}
+		
+		
+	}
 
 	var assert = require("assert");
 	
@@ -57,10 +79,9 @@ if (process.argv[2] == "tesdt") {
 	}
 	
 	
-	/*
-		test...
-	
-	*/
+
+		
+
 	console.log("\n Waiting test")
 	
 	urls.forEach(function(ele, ind, arr) {
